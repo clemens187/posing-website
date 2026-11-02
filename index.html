@@ -1,0 +1,846 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Posing-Vergleich</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: Bildleiste oben, Modus-Tabs, darunter neutrale graue Bühne links und Einstellungen rechts.
+   Vorher ist durchgehend bernsteinfarben, Nachher petrol. Die Oberfläche selbst bleibt grau-blau neutral. */
+:root{
+  --bg:#eceff2; --panel:#ffffff; --panel-2:#f3f5f7; --line:#d6dbe1;
+  --ink:#171c22; --ink-2:#47525e; --ink-3:#5f6a76; --on-ink:#ffffff;
+  --stage:#c3c8cf; --vorher:#c2700f; --nachher:#0e7c93; --guide:#d6336c;
+  --chip-bg:rgba(255,255,255,.92);
+  --font-display:'Familjen Grotesk','Helvetica Neue',Arial,sans-serif;
+  --font-body:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#121519; --panel:#1b1f25; --panel-2:#232830; --line:#323943;
+    --ink:#eef1f4; --ink-2:#b4bcc6; --ink-3:#8f99a6; --on-ink:#12161a;
+    --stage:#0e1013; --vorher:#f0a24b; --nachher:#4cc3dc; --guide:#ff6f9f;
+    --chip-bg:rgba(18,21,25,.86);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121519; --panel:#1b1f25; --panel-2:#232830; --line:#323943;
+  --ink:#eef1f4; --ink-2:#b4bcc6; --ink-3:#8f99a6; --on-ink:#12161a;
+  --stage:#0e1013; --vorher:#f0a24b; --nachher:#4cc3dc; --guide:#ff6f9f;
+  --chip-bg:rgba(18,21,25,.86);
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg); color:var(--ink);
+  font:14px/1.45 var(--font-body);
+  padding-block:20px 36px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.app{max-width:1320px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+
+/* Kopf */
+.top h1{margin:0;font:700 26px/1.1 var(--font-display);letter-spacing:-.01em}
+.top p{margin:6px 0 0;color:var(--ink-2);max-width:65ch}
+
+/* Bildleiste */
+.slots{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
+.slot{display:flex;align-items:center;gap:12px;padding:10px 12px 10px 10px;background:var(--panel);border:1px solid var(--line);border-radius:10px;min-width:0}
+.slot.over{border-style:dashed;border-color:var(--ink)}
+.thumb{width:44px;height:56px;object-fit:cover;border-radius:4px;background:var(--stage);flex:none}
+.meta{flex:1;min-width:0}
+.lab{display:flex;align-items:center;gap:7px;font:600 15px/1.2 var(--font-display)}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex:none}
+.dot.a{background:var(--vorher)} .dot.b{background:var(--nachher)}
+.fname{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink-2);margin-top:3px}
+.dim{font:12px var(--font-mono);color:var(--ink-3);margin-top:1px}
+.note{margin:-4px 0 0;min-height:1.5em;color:var(--ink-2);font-size:13px}
+
+.btn{border:1px solid var(--line);background:var(--panel-2);padding:7px 12px;border-radius:7px;cursor:pointer;line-height:1.2;transition:background .12s}
+.btn:hover{background:var(--line)}
+.btn[aria-pressed="true"]{background:var(--ink);color:var(--on-ink);border-color:var(--ink)}
+.btns{display:flex;flex-wrap:wrap;gap:6px}
+
+/* Modus-Leiste */
+.toolbar{display:flex;gap:10px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;min-width:0}
+.tab{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--line);background:var(--panel);border-radius:8px;cursor:pointer;line-height:1.1;transition:background .12s}
+.tab:hover{background:var(--panel-2)}
+.tab[aria-pressed="true"]{background:var(--ink);color:var(--on-ink);border-color:var(--ink)}
+.tab svg{flex:none}
+.tab kbd{font:11px var(--font-mono);opacity:.6}
+@media (pointer:coarse){.tab kbd{display:none}}
+
+/* Arbeitsfläche */
+.work{display:grid;grid-template-columns:minmax(0,1fr);gap:14px}
+@media (min-width:940px){.work{grid-template-columns:minmax(0,1fr) 312px;align-items:start}}
+.stageWrap{display:flex;flex-direction:column;gap:8px;min-width:0}
+.stage{position:relative;height:clamp(360px,62vh,700px);background:var(--stage);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+@media (min-width:940px){.stage{height:clamp(420px,74vh,860px)}}
+.box{position:absolute;touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab}
+.box.grabbing{cursor:grabbing}
+.panes{position:absolute;inset:0;isolation:isolate;overflow:hidden;background:var(--stage)}
+.panes.side{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--line)}
+.pane{overflow:hidden;position:absolute;inset:0}
+.panes.side .pane{position:relative;inset:auto;background:var(--stage)}
+.zoom{position:absolute;inset:0;transform-origin:0 0;will-change:transform}
+.zoom img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none;user-select:none;-webkit-user-drag:none;transform-origin:50% 50%}
+
+.ov{position:absolute;inset:0;pointer-events:none;z-index:3}
+.box:not(.side) .pane .ov{display:none}
+.box.side #ovS{display:none}
+.box.showGrid .ov{
+  background-image:
+    linear-gradient(to right,rgba(255,255,255,.6) 0 1px,rgba(0,0,0,.32) 1px 2px,transparent 2px),
+    linear-gradient(to bottom,rgba(255,255,255,.6) 0 1px,rgba(0,0,0,.32) 1px 2px,transparent 2px);
+  background-size:var(--cell,60px) var(--cell,60px);
+  background-position:50% 50%;
+}
+.box.showAxis .ov::before,.box.showAxis .ov::after{content:"";position:absolute;pointer-events:none}
+.box.showAxis .ov::before{left:50%;top:0;bottom:0;border-left:2px dashed var(--guide)}
+.box.showAxis .ov::after{top:50%;left:0;right:0;border-top:2px dashed var(--guide)}
+
+.guide{position:absolute;pointer-events:auto;touch-action:none}
+.guide.h{left:0;right:0;height:18px;margin-top:-9px;cursor:row-resize}
+.guide.v{top:0;bottom:0;width:18px;margin-left:-9px;cursor:col-resize}
+.guide::after{content:"";position:absolute;background:var(--guide);box-shadow:0 0 0 1px rgba(255,255,255,.6)}
+.guide.h::after{left:0;right:0;top:8px;height:2px}
+.guide.v::after{top:0;bottom:0;left:8px;width:2px}
+
+.divider{position:absolute;z-index:5;touch-action:none}
+.divider.v{top:0;bottom:0;width:34px;margin-left:-17px;cursor:col-resize}
+.divider.h{left:0;right:0;height:34px;margin-top:-17px;cursor:row-resize}
+.divider::before{content:"";position:absolute;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.45)}
+.divider.v::before{left:16px;width:2px;top:0;bottom:0}
+.divider.h::before{top:16px;height:2px;left:0;right:0}
+.grip{position:absolute;left:50%;top:50%;width:32px;height:32px;margin:-16px 0 0 -16px;border-radius:50%;background:#fff;color:#222;box-shadow:0 1px 5px rgba(0,0,0,.45);display:grid;place-items:center}
+.divider.h .grip svg{transform:rotate(90deg)}
+
+.lens{position:absolute;z-index:4;border-radius:50%;border:3px solid var(--nachher);box-shadow:0 0 0 1px rgba(255,255,255,.75),0 3px 12px rgba(0,0,0,.35);pointer-events:none}
+
+.chip{position:absolute;z-index:4;top:10px;display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:var(--chip-bg);color:var(--ink);font:600 12.5px/1 var(--font-display);letter-spacing:.02em;pointer-events:none;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.chip i{width:9px;height:9px;border-radius:50%;background:var(--dot,var(--ink-3))}
+.chip.tl{left:10px} .chip.tr{right:10px} .chip.bl{left:10px;top:auto;bottom:10px}
+
+.dz{position:absolute;z-index:8;top:8px;bottom:8px;display:none;align-items:center;justify-content:center;text-align:center;padding:12px;border:2px dashed var(--ink);border-radius:10px;background:var(--chip-bg);font:600 15px var(--font-display);pointer-events:none}
+.dz.a{left:8px;right:calc(50% + 4px)} .dz.b{right:8px;left:calc(50% + 4px)}
+.stage.dragging .dz{display:flex}
+.stage[data-half="a"] .dz.b,.stage[data-half="b"] .dz.a{opacity:.4}
+
+.stageBar{display:flex;justify-content:space-between;gap:6px 14px;flex-wrap:wrap;color:var(--ink-3);font-size:12.5px}
+.stageBar .z{font-family:var(--font-mono);color:var(--ink-2);font-variant-numeric:tabular-nums}
+@media (pointer:coarse){.hint-fine{display:none}}
+@media (pointer:fine){.hint-coarse{display:none}}
+
+/* Einstellungen */
+.side{background:var(--panel);border:1px solid var(--line);border-radius:10px;min-width:0}
+.sec{padding:14px;display:flex;flex-direction:column;gap:12px}
+.sec+.sec{border-top:1px solid var(--line)}
+.sh{margin:0;font:600 11.5px/1 var(--font-display);text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3)}
+.modeName{font:600 18px/1.2 var(--font-display)}
+.desc{margin:4px 0 0;color:var(--ink-2);font-size:13px;line-height:1.5}
+.ctl{display:flex;flex-direction:column;gap:6px}
+.row{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.val{font:12.5px var(--font-mono);color:var(--ink-2);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;margin:0;height:22px;accent-color:var(--ink)}
+.chk{display:flex;align-items:center;gap:9px;cursor:pointer}
+.chk input{width:16px;height:16px;margin:0;accent-color:var(--ink)}
+.seg{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{display:flex;align-items:center;justify-content:center;gap:7px;border:0;padding:8px;background:var(--panel-2);color:var(--ink-2);cursor:pointer}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--on-ink)}
+.small{margin:0;color:var(--ink-2);font-size:12.5px}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="app">
+  <header class="top">
+    <h1>Posing-Vergleich</h1>
+    <p>Lade zwei Posing-Bilder, lege sie übereinander, teile sie oder prüfe Unterschiede mit Raster und Hilfslinien. Die Bilder bleiben auf deinem Gerät.</p>
+  </header>
+
+  <section class="slots" aria-label="Bilder laden">
+    <div class="slot" id="slotA">
+      <img class="thumb" id="thumbA" alt="">
+      <div class="meta">
+        <div class="lab"><i class="dot a"></i>Vorher</div>
+        <div class="fname" id="nameA"></div>
+        <div class="dim" id="dimA"></div>
+      </div>
+      <button class="btn" type="button" id="pickA">Bild wählen</button>
+      <input type="file" id="fileA" accept="image/*" multiple hidden>
+    </div>
+    <div class="slot" id="slotB">
+      <img class="thumb" id="thumbB" alt="">
+      <div class="meta">
+        <div class="lab"><i class="dot b"></i>Nachher</div>
+        <div class="fname" id="nameB"></div>
+        <div class="dim" id="dimB"></div>
+      </div>
+      <button class="btn" type="button" id="pickB">Bild wählen</button>
+      <input type="file" id="fileB" accept="image/*" multiple hidden>
+    </div>
+  </section>
+  <p class="note" id="note" role="status" aria-live="polite"></p>
+
+  <div class="toolbar">
+    <div class="tabs" id="tabs" role="group" aria-label="Vergleichsmodus"></div>
+    <button class="btn" type="button" id="swap">Vorher und Nachher tauschen</button>
+  </div>
+
+  <div class="work">
+    <div class="stageWrap">
+      <div class="stage" id="stage">
+        <div class="box" id="box">
+          <div class="panes" id="panes">
+            <div class="pane" id="paneA">
+              <div class="zoom" id="zoomA"><img id="imgA" alt="Vorher"></div>
+              <div class="ov" id="ovA"></div>
+            </div>
+            <div class="pane" id="paneB">
+              <div class="zoom" id="zoomB"><img id="imgB" alt="Nachher"></div>
+              <div class="ov" id="ovB"></div>
+            </div>
+          </div>
+          <div class="ov" id="ovS"></div>
+          <div class="divider v" id="divider" hidden><span class="grip"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M5 4 1.5 8 5 12M11 4l3.5 4L11 12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+          <div class="lens" id="lens" hidden></div>
+          <span class="chip tl" id="chip1"><i></i><span></span></span>
+          <span class="chip tr" id="chip2"><i></i><span></span></span>
+        </div>
+        <div class="dz a">Als Vorher laden</div>
+        <div class="dz b">Als Nachher laden</div>
+      </div>
+      <div class="stageBar">
+        <span class="hint-fine">Mausrad zoomt · Ziehen verschiebt · Doppelklick passt ein · Tasten 1 bis 8 wechseln den Modus</span>
+        <span class="hint-coarse">Zwei Finger zoomen · Ziehen verschiebt</span>
+        <span class="z" id="zoomRead">Zoom 100 %</span>
+      </div>
+    </div>
+
+    <aside class="side" aria-label="Einstellungen">
+      <section class="sec">
+        <h2 class="sh">Modus</h2>
+        <div>
+          <div class="modeName" id="modeName"></div>
+          <p class="desc" id="modeDesc"></p>
+        </div>
+
+        <div class="ctl" data-modes="splitv splith">
+          <div class="row"><label for="splitPos">Trennlinie</label><span class="val" id="splitPosOut"></span></div>
+          <input type="range" id="splitPos" min="0" max="100" step="0.5">
+        </div>
+        <div class="ctl" data-modes="fade">
+          <div class="row"><label for="fade">Deckkraft Nachher</label><span class="val" id="fadeOut"></span></div>
+          <input type="range" id="fade" min="0" max="100" step="1">
+        </div>
+        <div class="ctl" data-modes="diff">
+          <div class="row"><label for="gain">Verstärkung</label><span class="val" id="gainOut"></span></div>
+          <input type="range" id="gain" min="100" max="600" step="10">
+          <label class="chk"><input type="checkbox" id="invert">Invertieren (Gleiches hell)</label>
+        </div>
+        <div class="ctl" data-modes="checker">
+          <div class="row"><label for="checker">Feldgröße</label><span class="val" id="checkerOut"></span></div>
+          <input type="range" id="checker" min="20" max="240" step="5">
+        </div>
+        <div class="ctl" data-modes="blink">
+          <div class="row"><label for="blinkSec">Wechsel alle</label><span class="val" id="blinkSecOut"></span></div>
+          <input type="range" id="blinkSec" min="0.4" max="2" step="0.1">
+          <div class="btns">
+            <button class="btn" type="button" id="blinkPlay"></button>
+            <button class="btn" type="button" id="blinkNow">Jetzt wechseln</button>
+          </div>
+        </div>
+        <div class="ctl" data-modes="lens">
+          <div class="row"><label for="lensR">Linsengröße</label><span class="val" id="lensROut"></span></div>
+          <input type="range" id="lensR" min="50" max="300" step="5">
+        </div>
+      </section>
+
+      <section class="sec">
+        <h2 class="sh">Ansicht</h2>
+        <div class="ctl">
+          <div class="row"><label for="zoom">Zoom</label><span class="val" id="zoomOut"></span></div>
+          <input type="range" id="zoom" min="100" max="800" step="10">
+        </div>
+        <div class="btns"><button class="btn" type="button" id="fit">Einpassen</button></div>
+      </section>
+
+      <section class="sec">
+        <h2 class="sh">Raster und Hilfslinien</h2>
+        <label class="chk"><input type="checkbox" id="grid">Raster anzeigen</label>
+        <div class="ctl">
+          <div class="row"><label for="gridN">Felder in der Breite</label><span class="val" id="gridNOut"></span></div>
+          <input type="range" id="gridN" min="4" max="20" step="1">
+        </div>
+        <label class="chk"><input type="checkbox" id="axis">Mittelachsen anzeigen</label>
+        <div class="btns">
+          <button class="btn" type="button" id="addH">Waagerechte Linie</button>
+          <button class="btn" type="button" id="addV">Senkrechte Linie</button>
+          <button class="btn" type="button" id="clearG">Alle Linien löschen</button>
+        </div>
+        <p class="small">Linien lassen sich ziehen. Ein Doppelklick auf eine Linie löscht sie.</p>
+      </section>
+
+      <section class="sec">
+        <h2 class="sh">Bild ausrichten</h2>
+        <p class="small">Gleiche Abstand und Winkel der Aufnahmen an, damit die Posen deckungsgleich liegen.</p>
+        <div class="seg" role="group" aria-label="Welches Bild ausrichten">
+          <button type="button" id="tgtA" aria-pressed="false"><i class="dot a"></i>Vorher</button>
+          <button type="button" id="tgtB" aria-pressed="true"><i class="dot b"></i>Nachher</button>
+        </div>
+        <div class="ctl">
+          <div class="row"><label for="aS">Größe</label><span class="val" id="aSOut"></span></div>
+          <input type="range" id="aS" min="50" max="200" step="0.5">
+        </div>
+        <div class="ctl">
+          <div class="row"><label for="aX">Horizontal</label><span class="val" id="aXOut"></span></div>
+          <input type="range" id="aX" min="-30" max="30" step="0.1">
+        </div>
+        <div class="ctl">
+          <div class="row"><label for="aY">Vertikal</label><span class="val" id="aYOut"></span></div>
+          <input type="range" id="aY" min="-30" max="30" step="0.1">
+        </div>
+        <div class="ctl">
+          <div class="row"><label for="aR">Drehung</label><span class="val" id="aROut"></span></div>
+          <input type="range" id="aR" min="-20" max="20" step="0.1">
+        </div>
+        <div class="btns">
+          <button class="btn" type="button" id="aFlip" aria-pressed="false">Spiegeln</button>
+          <button class="btn" type="button" id="aReset">Zurücksetzen</button>
+        </div>
+      </section>
+    </aside>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+const $ = id => document.getElementById(id);
+const clamp = (v,a,b) => Math.min(b, Math.max(a, v));
+const n1 = v => v.toLocaleString('de-AT',{minimumFractionDigits:1,maximumFractionDigits:1});
+const sgn = v => (v > 0 ? '+' : '') + n1(v);
+
+const ico = p => '<svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>';
+
+const MODES = [
+  {id:'side', label:'Nebeneinander', icon:ico('<rect x="1.5" y="2.5" width="5.5" height="11" rx="1"/><rect x="9" y="2.5" width="5.5" height="11" rx="1"/>'),
+   desc:'Beide Bilder gleichzeitig, links Vorher und rechts Nachher. Zoom und Verschieben laufen in beiden Hälften synchron.'},
+  {id:'splitv', label:'Split senkrecht', icon:ico('<rect x="1.5" y="2.5" width="13" height="11" rx="1"/><path d="M8 2.5v11"/><path d="M8 3h6v10H8z" fill="currentColor" stroke="none" opacity=".35"/>'),
+   desc:'Ein Bild, zwei Hälften. Ziehe die Trennlinie nach links oder rechts. Links siehst du Vorher, rechts Nachher.'},
+  {id:'splith', label:'Split waagerecht', icon:ico('<rect x="1.5" y="2.5" width="13" height="11" rx="1"/><path d="M1.5 8h13"/><path d="M2 8h12v5H2z" fill="currentColor" stroke="none" opacity=".35"/>'),
+   desc:'Wie der senkrechte Split, nur von oben nach unten. Oben Vorher, unten Nachher. Gut für Schulterlinie, Taille und Hüfthöhe.'},
+  {id:'fade', label:'Überblendung', icon:ico('<circle cx="6" cy="8" r="4.5"/><circle cx="10" cy="8" r="4.5"/>'),
+   desc:'Nachher liegt halbtransparent über Vorher. Mit dem Regler stufenlos blenden, so fallen Umrisse und Haltung sofort auf.'},
+  {id:'diff', label:'Differenz', icon:ico('<path d="M8 2.5v6M5 5.5h6M5 12.5h6"/>'),
+   desc:'Zeigt nur, was sich unterscheidet. Schwarz heißt gleich, hell heißt Veränderung. Am aussagekräftigsten, wenn beide Bilder unter „Bild ausrichten“ deckungsgleich liegen.'},
+  {id:'checker', label:'Schachbrett', icon:ico('<rect x="1.5" y="1.5" width="13" height="13" rx="1"/><rect x="2" y="2" width="6" height="6" fill="currentColor" stroke="none"/><rect x="8" y="8" width="6" height="6" fill="currentColor" stroke="none"/>'),
+   desc:'Vorher und Nachher wechseln sich Feld für Feld ab. Konturen, die an den Feldkanten nicht durchlaufen, zeigen einen Versatz.'},
+  {id:'blink', label:'Blinken', icon:ico('<path d="M1.5 8S4 3.5 8 3.5 14.5 8 14.5 8 12 12.5 8 12.5 1.5 8 1.5 8z"/><circle cx="8" cy="8" r="1.8"/>'),
+   desc:'Wechselt automatisch zwischen beiden Bildern. Das Auge erkennt kleinste Verschiebungen. Der Takt bleibt bewusst langsam.'},
+  {id:'lens', label:'Linse', icon:ico('<circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/>'),
+   desc:'Eine runde Linse zeigt Nachher mitten im Vorher-Bild. Fahre mit Maus oder Finger über die Stelle, die dich interessiert.'}
+];
+
+/* Beispielbilder, damit die Seite sofort etwas zeigt */
+function makeExample(kind){
+  const W = 800, H = 1000, c = document.createElement('canvas');
+  c.width = W; c.height = H;
+  const x = c.getContext('2d');
+  const g = x.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'#e6e9ed'); g.addColorStop(1,'#cbd1d8');
+  x.fillStyle = g; x.fillRect(0,0,W,H);
+  x.fillStyle = '#b9c0c8'; x.fillRect(0,880,W,120);
+  x.fillStyle = '#a7afb8'; x.fillRect(0,880,W,3);
+
+  const P = kind === 'a'
+    ? {ox:0,  sc:1,    sw:112, a1:74, a2:86,  spread:0}
+    : {ox:18, sc:1.04, sw:128, a1:4,  a2:-80, spread:22};
+  const rad = d => d * Math.PI / 180;
+  const cx = W / 2, body = '#2b3139', limb = '#39414b';
+
+  x.save();
+  x.translate(W/2 + P.ox, 930); x.scale(P.sc, P.sc); x.translate(-W/2, -930);
+  x.fillStyle = 'rgba(0,0,0,.18)';
+  x.beginPath(); x.ellipse(cx, 930, 190 + P.spread, 16, 0, 0, Math.PI*2); x.fill();
+  x.lineCap = 'round'; x.lineJoin = 'round';
+
+  for (const s of [-1,1]) {
+    x.strokeStyle = limb;
+    x.lineWidth = 84; x.beginPath(); x.moveTo(cx + s*40, 590); x.lineTo(cx + s*(56 + P.spread), 750); x.stroke();
+    x.lineWidth = 58; x.beginPath(); x.moveTo(cx + s*(56 + P.spread), 750); x.lineTo(cx + s*(62 + P.spread), 905); x.stroke();
+    x.fillStyle = body; x.beginPath(); x.ellipse(cx + s*(70 + P.spread), 922, 44, 14, 0, 0, Math.PI*2); x.fill();
+  }
+
+  x.fillStyle = body; x.beginPath();
+  x.moveTo(cx - P.sw, 292);
+  x.quadraticCurveTo(cx - P.sw - 4, 390, cx - 70, 500);
+  x.lineTo(cx - 82, 606); x.lineTo(cx + 82, 606); x.lineTo(cx + 70, 500);
+  x.quadraticCurveTo(cx + P.sw + 4, 390, cx + P.sw, 292);
+  x.quadraticCurveTo(cx, 262, cx - P.sw, 292);
+  x.fill();
+  x.fillRect(cx - 24, 215, 48, 70);
+  x.beginPath(); x.arc(cx, 172, 50, 0, Math.PI*2); x.fill();
+
+  for (const s of [-1,1]) {
+    const sx = cx + s*(P.sw - 8), sy = 306;
+    const ex = sx + s*Math.cos(rad(P.a1))*150, ey = sy + Math.sin(rad(P.a1))*150;
+    const wx = ex + s*Math.cos(rad(P.a2))*134, wy = ey + Math.sin(rad(P.a2))*134;
+    x.strokeStyle = limb; x.fillStyle = limb;
+    x.lineWidth = 64; x.beginPath(); x.moveTo(sx, sy); x.lineTo(ex, ey); x.stroke();
+    x.lineWidth = 48; x.beginPath(); x.moveTo(ex, ey); x.lineTo(wx, wy); x.stroke();
+    x.beginPath(); x.arc(sx, sy, 38, 0, Math.PI*2); x.fill();
+    x.beginPath(); x.arc(wx, wy, 27, 0, Math.PI*2); x.fill();
+  }
+  x.restore();
+
+  x.font = '600 26px system-ui,sans-serif';
+  x.fillStyle = '#5c6671';
+  x.fillText(kind === 'a' ? 'Beispiel · Vorher' : 'Beispiel · Nachher', 24, 968);
+  return c.toDataURL('image/jpeg', .9);
+}
+
+const newAlign = () => ({s:100, x:0, y:0, r:0, f:false});
+const S = {
+  mode:'side',
+  a:{url:makeExample('a'), name:'', w:800, h:1000, example:true, blob:false},
+  b:{url:makeExample('b'), name:'', w:800, h:1000, example:true, blob:false},
+  align:{a:newAlign(), b:newAlign()},
+  target:'b',
+  view:{z:1, nx:0, ny:0},
+  split:{v:50, h:50},
+  fade:50, gain:150, invert:false, checker:90,
+  blinkSec:0.8, blinkB:false, blinkPlay:!window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+  lensR:120, lens:{x:.5, y:.4},
+  grid:false, gridN:8, axis:false,
+  guides:[]
+};
+
+const el = {};
+['stage','box','panes','paneA','paneB','zoomA','zoomB','imgA','imgB','ovA','ovB','ovS','divider','lens','chip1','chip2','tabs','modeName','modeDesc','note','zoomRead'].forEach(id => el[id] = $(id));
+
+/* ---------- Layout und Darstellung ---------- */
+function layout(side){
+  const sw = el.stage.clientWidth, sh = el.stage.clientHeight;
+  let w = sw, h = sh;
+  if (!side) {
+    const r = S.a.w / S.a.h;
+    if (sw / sh > r) { h = sh; w = sh * r; } else { w = sw; h = sw / r; }
+  }
+  const st = el.box.style;
+  st.width = w + 'px'; st.height = h + 'px';
+  st.left = ((sw - w) / 2) + 'px'; st.top = ((sh - h) / 2) + 'px';
+  return {w, h};
+}
+
+const alignTf = a => {
+  const k = a.s / 100;
+  return 'translate(' + a.x + '%,' + a.y + '%) rotate(' + a.r + 'deg) scale(' + (a.f ? -k : k) + ',' + k + ')';
+};
+
+function setChip(c, txt, color, pos){
+  c.hidden = !txt;
+  if (!txt) return;
+  c.className = 'chip ' + pos;
+  c.style.setProperty('--dot', color);
+  c.querySelector('span').textContent = txt;
+}
+
+function render(){
+  const side = S.mode === 'side';
+  const {w, h} = layout(side);
+  el.box.classList.toggle('side', side);
+  el.panes.classList.toggle('side', side);
+  el.box.classList.toggle('showGrid', S.grid);
+  el.box.classList.toggle('showAxis', S.axis);
+
+  for (const k of ['a','b']) {
+    const img = el['img' + k.toUpperCase()];
+    if (img.dataset.u !== S[k].url) { img.dataset.u = S[k].url; img.src = S[k].url; }
+    img.style.transform = alignTf(S.align[k]);
+  }
+  for (const k of ['A','B']) {
+    const p = el['pane' + k];
+    el['zoom' + k].style.transform = 'translate(' + (S.view.nx * p.clientWidth) + 'px,' + (S.view.ny * p.clientHeight) + 'px) scale(' + S.view.z + ')';
+  }
+
+  const pb = el.paneB.style, ps = el.panes.style;
+  pb.clipPath = ''; pb.opacity = ''; pb.mixBlendMode = ''; pb.maskImage = ''; pb.webkitMaskImage = '';
+  ps.filter = ''; ps.background = '';
+  switch (S.mode) {
+    case 'splitv': pb.clipPath = 'inset(0 0 0 ' + S.split.v + '%)'; break;
+    case 'splith': pb.clipPath = 'inset(' + S.split.h + '% 0 0 0)'; break;
+    case 'fade': pb.opacity = S.fade / 100; break;
+    case 'diff':
+      pb.mixBlendMode = 'difference'; ps.background = '#000';
+      ps.filter = 'brightness(' + (S.gain / 100) + ')' + (S.invert ? ' invert(1)' : '');
+      break;
+    case 'checker': {
+      const m = 'conic-gradient(#000 25%, #0000 0 50%, #000 0 75%, #0000 0)';
+      const sz = (S.checker * 2) + 'px ' + (S.checker * 2) + 'px';
+      pb.maskImage = m; pb.webkitMaskImage = m; pb.maskSize = sz; pb.webkitMaskSize = sz;
+      break;
+    }
+    case 'blink': pb.opacity = S.blinkB ? 1 : 0; break;
+    case 'lens': pb.clipPath = 'circle(' + S.lensR + 'px at ' + (S.lens.x * w) + 'px ' + (S.lens.y * h) + 'px)'; break;
+  }
+
+  /* Trennlinie */
+  const isSplit = S.mode === 'splitv' || S.mode === 'splith';
+  el.divider.hidden = !isSplit;
+  if (isSplit) {
+    const v = S.mode === 'splitv';
+    el.divider.className = 'divider ' + (v ? 'v' : 'h');
+    el.divider.style.left = v ? S.split.v + '%' : '';
+    el.divider.style.top = v ? '' : S.split.h + '%';
+  }
+  /* Linse */
+  el.lens.hidden = S.mode !== 'lens';
+  if (S.mode === 'lens') {
+    const d = S.lensR * 2 + 6;
+    el.lens.style.width = d + 'px'; el.lens.style.height = d + 'px';
+    el.lens.style.left = (S.lens.x * w - S.lensR - 3) + 'px';
+    el.lens.style.top = (S.lens.y * h - S.lensR - 3) + 'px';
+  }
+
+  /* Raster */
+  if (S.grid) {
+    [el.ovA, el.ovB, el.ovS].forEach(ov => ov.style.setProperty('--cell', (ov.parentElement.clientWidth / S.gridN) + 'px'));
+  }
+
+  /* Beschriftungen */
+  const V = 'var(--vorher)', N = 'var(--nachher)';
+  switch (S.mode) {
+    case 'splith': setChip(el.chip1, 'Vorher', V, 'tl'); setChip(el.chip2, 'Nachher', N, 'bl'); break;
+    case 'fade': setChip(el.chip1, 'Vorher', V, 'tl'); setChip(el.chip2, 'Nachher ' + S.fade + ' %', N, 'tr'); break;
+    case 'diff': setChip(el.chip1, 'Differenz', 'var(--ink-3)', 'tl'); setChip(el.chip2, '', '', 'tr'); break;
+    case 'blink': setChip(el.chip1, S.blinkB ? 'Nachher' : 'Vorher', S.blinkB ? N : V, 'tl'); setChip(el.chip2, '', '', 'tr'); break;
+    default: setChip(el.chip1, 'Vorher', V, 'tl'); setChip(el.chip2, 'Nachher', N, 'tr');
+  }
+
+  /* Zoom-Anzeige */
+  const zv = Math.round(S.view.z * 100);
+  el.zoomRead.textContent = 'Zoom ' + zv + ' %';
+  if (+$('zoom').value !== zv) $('zoom').value = zv;
+  $('zoomOut').textContent = zv + ' %';
+}
+
+/* ---------- Steuerelemente ---------- */
+const syncers = [];
+function bindRange(id, get, set, fmt){
+  const inp = $(id), out = $(id + 'Out');
+  inp.addEventListener('input', () => { const v = +inp.value; set(v); out.textContent = fmt(v); render(); });
+  syncers.push(() => { const v = get(); if (+inp.value !== v) inp.value = v; out.textContent = fmt(v); });
+}
+bindRange('splitPos', () => S.mode === 'splith' ? S.split.h : S.split.v, v => { if (S.mode === 'splith') S.split.h = v; else S.split.v = v; }, v => v.toFixed(0) + ' %');
+bindRange('fade', () => S.fade, v => S.fade = v, v => v + ' %');
+bindRange('gain', () => S.gain, v => S.gain = v, v => v + ' %');
+bindRange('checker', () => S.checker, v => S.checker = v, v => v + ' px');
+bindRange('blinkSec', () => S.blinkSec, v => { S.blinkSec = v; syncBlink(); }, v => n1(v) + ' s');
+bindRange('lensR', () => S.lensR, v => S.lensR = v, v => v + ' px');
+bindRange('gridN', () => S.gridN, v => S.gridN = v, v => String(v));
+bindRange('aS', () => S.align[S.target].s, v => S.align[S.target].s = v, v => n1(v) + ' %');
+bindRange('aX', () => S.align[S.target].x, v => S.align[S.target].x = v, v => sgn(v) + ' %');
+bindRange('aY', () => S.align[S.target].y, v => S.align[S.target].y = v, v => sgn(v) + ' %');
+bindRange('aR', () => S.align[S.target].r, v => S.align[S.target].r = v, v => sgn(v) + '°');
+
+$('zoom').addEventListener('input', e => {
+  const r = el.paneA.getBoundingClientRect();
+  zoomAtPx(r.width / 2, r.height / 2, r.width, r.height, +e.target.value / 100);
+  render();
+});
+$('invert').addEventListener('change', e => { S.invert = e.target.checked; render(); });
+$('grid').addEventListener('change', e => { S.grid = e.target.checked; render(); });
+$('axis').addEventListener('change', e => { S.axis = e.target.checked; render(); });
+$('fit').addEventListener('click', resetView);
+
+$('blinkPlay').addEventListener('click', () => { S.blinkPlay = !S.blinkPlay; syncBlink(); syncControls(); });
+$('blinkNow').addEventListener('click', () => { S.blinkB = !S.blinkB; render(); });
+
+$('tgtA').addEventListener('click', () => { S.target = 'a'; syncControls(); });
+$('tgtB').addEventListener('click', () => { S.target = 'b'; syncControls(); });
+$('aFlip').addEventListener('click', () => { const a = S.align[S.target]; a.f = !a.f; syncControls(); render(); });
+$('aReset').addEventListener('click', () => { S.align[S.target] = newAlign(); syncControls(); render(); });
+
+$('swap').addEventListener('click', () => {
+  [S.a, S.b] = [S.b, S.a];
+  [S.align.a, S.align.b] = [S.align.b, S.align.a];
+  updateSlots(); syncControls(); render();
+});
+
+function addGuide(o){
+  const n = S.guides.length;
+  S.guides.push({o, p: 0.25 + (n % 5) * 0.125});
+  renderGuides();
+}
+$('addH').addEventListener('click', () => addGuide('h'));
+$('addV').addEventListener('click', () => addGuide('v'));
+$('clearG').addEventListener('click', () => { S.guides = []; renderGuides(); });
+
+function syncControls(){
+  const m = MODES.find(x => x.id === S.mode);
+  el.modeName.textContent = m.label;
+  el.modeDesc.textContent = m.desc;
+  el.tabs.querySelectorAll('.tab').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === S.mode)));
+  document.querySelectorAll('.ctl[data-modes]').forEach(c => { c.hidden = !c.dataset.modes.split(' ').includes(S.mode); });
+  syncers.forEach(f => f());
+  $('invert').checked = S.invert;
+  $('grid').checked = S.grid;
+  $('axis').checked = S.axis;
+  $('blinkPlay').textContent = S.blinkPlay ? 'Pause' : 'Abspielen';
+  $('tgtA').setAttribute('aria-pressed', String(S.target === 'a'));
+  $('tgtB').setAttribute('aria-pressed', String(S.target === 'b'));
+  $('aFlip').setAttribute('aria-pressed', String(S.align[S.target].f));
+}
+
+/* Modus-Tabs */
+MODES.forEach((m, i) => {
+  const b = document.createElement('button');
+  b.type = 'button'; b.className = 'tab'; b.dataset.mode = m.id;
+  b.setAttribute('aria-pressed', 'false');
+  b.setAttribute('aria-keyshortcuts', String(i + 1));
+  b.innerHTML = m.icon + '<span>' + m.label + '</span><kbd>' + (i + 1) + '</kbd>';
+  b.addEventListener('click', () => setMode(m.id));
+  el.tabs.appendChild(b);
+});
+
+function setMode(id){
+  S.mode = id;
+  syncBlink(); syncControls(); render();
+}
+
+/* Blinken */
+let blinkTimer = null;
+function syncBlink(){
+  clearInterval(blinkTimer); blinkTimer = null;
+  if (S.mode === 'blink' && S.blinkPlay) {
+    blinkTimer = setInterval(() => { S.blinkB = !S.blinkB; render(); }, S.blinkSec * 1000);
+  }
+}
+
+/* ---------- Zoom und Verschieben ---------- */
+function clampView(){
+  const v = S.view;
+  v.z = clamp(v.z, 1, 10);
+  v.nx = clamp(v.nx, 1 - v.z, 0);
+  v.ny = clamp(v.ny, 1 - v.z, 0);
+}
+function zoomAtPx(px, py, W, H, nz){
+  nz = clamp(nz, 1, 10);
+  const k = nz / S.view.z, tx = S.view.nx * W, ty = S.view.ny * H;
+  S.view.nx = (px - (px - tx) * k) / W;
+  S.view.ny = (py - (py - ty) * k) / H;
+  S.view.z = nz;
+  clampView();
+}
+function paneAt(cx){
+  if (S.mode !== 'side') return el.paneB;
+  const r = el.box.getBoundingClientRect();
+  return cx < r.left + r.width / 2 ? el.paneA : el.paneB;
+}
+function zoomAtClient(cx, cy, nz){
+  const r = paneAt(cx).getBoundingClientRect();
+  zoomAtPx(cx - r.left, cy - r.top, r.width, r.height, nz);
+  render();
+}
+function panBy(dx, dy){
+  const r = el.paneA.getBoundingClientRect();
+  S.view.nx += dx / r.width; S.view.ny += dy / r.height;
+  clampView(); render();
+}
+function resetView(){ S.view = {z:1, nx:0, ny:0}; render(); }
+
+/* ---------- Zeigerereignisse ---------- */
+const ptrs = new Map();
+let drag = null;
+
+function moveLens(e){
+  const r = el.box.getBoundingClientRect();
+  S.lens.x = clamp((e.clientX - r.left) / r.width, 0, 1);
+  S.lens.y = clamp((e.clientY - r.top) / r.height, 0, 1);
+  render();
+}
+function moveDivider(e){
+  const r = el.box.getBoundingClientRect();
+  if (S.mode === 'splitv') S.split.v = clamp((e.clientX - r.left) / r.width * 100, 0, 100);
+  else S.split.h = clamp((e.clientY - r.top) / r.height * 100, 0, 100);
+  syncers.forEach(f => f());
+  render();
+}
+function moveGuide(e){
+  const g = S.guides[drag.i]; if (!g) return;
+  const r = drag.ov.getBoundingClientRect();
+  g.p = clamp(g.o === 'h' ? (e.clientY - r.top) / r.height : (e.clientX - r.left) / r.width, 0, 1);
+  document.querySelectorAll('.guide[data-i="' + drag.i + '"]').forEach(n => { n.style[g.o === 'h' ? 'top' : 'left'] = (g.p * 100) + '%'; });
+}
+
+el.box.addEventListener('pointerdown', e => {
+  if (drag) return;
+  const g = e.target.closest('.guide');
+  if (g) {
+    el.box.setPointerCapture(e.pointerId);
+    drag = {type:'guide', id:e.pointerId, i:+g.dataset.i, ov:g.parentElement};
+    return;
+  }
+  if (e.target.closest('.divider')) {
+    el.box.setPointerCapture(e.pointerId);
+    drag = {type:'div', id:e.pointerId};
+    moveDivider(e);
+    return;
+  }
+  el.box.setPointerCapture(e.pointerId);
+  ptrs.set(e.pointerId, {x:e.clientX, y:e.clientY});
+  el.box.classList.add('grabbing');
+  if (S.mode === 'lens') moveLens(e);
+});
+
+el.box.addEventListener('pointermove', e => {
+  if (drag) {
+    if (e.pointerId !== drag.id) return;
+    if (drag.type === 'div') moveDivider(e); else moveGuide(e);
+    return;
+  }
+  if (S.mode === 'lens' && (e.pointerType === 'mouse' || ptrs.has(e.pointerId))) moveLens(e);
+  const p = ptrs.get(e.pointerId);
+  if (!p) return;
+  if (ptrs.size === 1) {
+    const dx = e.clientX - p.x, dy = e.clientY - p.y;
+    ptrs.set(e.pointerId, {x:e.clientX, y:e.clientY});
+    panBy(dx, dy);
+  } else if (ptrs.size === 2) {
+    const o = [...ptrs.values()];
+    const d0 = Math.hypot(o[0].x - o[1].x, o[0].y - o[1].y);
+    const m0 = {x:(o[0].x + o[1].x) / 2, y:(o[0].y + o[1].y) / 2};
+    ptrs.set(e.pointerId, {x:e.clientX, y:e.clientY});
+    const q = [...ptrs.values()];
+    const d1 = Math.hypot(q[0].x - q[1].x, q[0].y - q[1].y);
+    const m1 = {x:(q[0].x + q[1].x) / 2, y:(q[0].y + q[1].y) / 2};
+    if (d0 > 0) zoomAtClient(m0.x, m0.y, S.view.z * d1 / d0);
+    panBy(m1.x - m0.x, m1.y - m0.y);
+  }
+});
+
+const endPtr = e => {
+  if (drag && drag.id === e.pointerId) drag = null;
+  ptrs.delete(e.pointerId);
+  if (!ptrs.size) el.box.classList.remove('grabbing');
+};
+el.box.addEventListener('pointerup', endPtr);
+el.box.addEventListener('pointercancel', endPtr);
+
+el.box.addEventListener('wheel', e => {
+  e.preventDefault();
+  zoomAtClient(e.clientX, e.clientY, S.view.z * Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.0018)));
+}, {passive:false});
+
+el.box.addEventListener('dblclick', e => {
+  const g = e.target.closest('.guide');
+  if (g) { S.guides.splice(+g.dataset.i, 1); renderGuides(); return; }
+  if (e.target.closest('.divider')) return;
+  resetView();
+});
+
+/* ---------- Hilfslinien ---------- */
+function renderGuides(){
+  [el.ovA, el.ovB, el.ovS].forEach(ov => {
+    ov.querySelectorAll('.guide').forEach(n => n.remove());
+    S.guides.forEach((g, i) => {
+      const n = document.createElement('div');
+      n.className = 'guide ' + g.o;
+      n.dataset.i = i;
+      n.style[g.o === 'h' ? 'top' : 'left'] = (g.p * 100) + '%';
+      ov.appendChild(n);
+    });
+  });
+}
+
+/* ---------- Bilder laden ---------- */
+let noteT;
+function note(t){
+  el.note.textContent = t;
+  clearTimeout(noteT);
+  noteT = setTimeout(() => { el.note.textContent = ''; }, 8000);
+}
+
+function updateSlots(){
+  for (const k of ['a','b']) {
+    const K = k.toUpperCase(), s = S[k];
+    $('thumb' + K).src = s.url;
+    $('name' + K).textContent = s.example ? 'Beispielbild' : s.name;
+    $('dim' + K).textContent = s.w + ' × ' + s.h + ' px';
+  }
+}
+
+function loadFile(file, slot){
+  const url = URL.createObjectURL(file);
+  const im = new Image();
+  im.onload = () => {
+    if (S[slot].blob) URL.revokeObjectURL(S[slot].url);
+    S[slot] = {url, name:file.name, w:im.naturalWidth, h:im.naturalHeight, example:false, blob:true};
+    S.align[slot] = newAlign();
+    updateSlots(); syncControls(); render();
+  };
+  im.onerror = () => {
+    URL.revokeObjectURL(url);
+    note('„' + file.name + '“ lässt sich nicht anzeigen. Bei HEIC-Fotos hilft ein Export als JPG oder PNG.');
+  };
+  im.src = url;
+}
+
+function handleFiles(files, slot){
+  const list = [...files].filter(f => f.type.startsWith('image/') || /\.(jpe?g|png|webp|gif|heic|heif|avif|bmp)$/i.test(f.name));
+  if (!list.length) { note('Das war keine Bilddatei.'); return; }
+  if (list.length >= 2) { loadFile(list[0], 'a'); loadFile(list[1], 'b'); }
+  else loadFile(list[0], slot);
+}
+
+['a','b'].forEach(k => {
+  const K = k.toUpperCase(), slot = $('slot' + K), input = $('file' + K);
+  $('pick' + K).addEventListener('click', () => input.click());
+  input.addEventListener('change', () => { if (input.files.length) handleFiles(input.files, k); input.value = ''; });
+  slot.addEventListener('dragover', e => { e.preventDefault(); slot.classList.add('over'); });
+  slot.addEventListener('dragleave', e => { if (!slot.contains(e.relatedTarget)) slot.classList.remove('over'); });
+  slot.addEventListener('drop', e => { e.preventDefault(); slot.classList.remove('over'); handleFiles(e.dataTransfer.files, k); });
+});
+
+/* Ablegen auf der Bühne: linke Hälfte = Vorher, rechte Hälfte = Nachher */
+const halfOf = e => { const r = el.stage.getBoundingClientRect(); return e.clientX < r.left + r.width / 2 ? 'a' : 'b'; };
+el.stage.addEventListener('dragover', e => { e.preventDefault(); el.stage.classList.add('dragging'); el.stage.dataset.half = halfOf(e); });
+el.stage.addEventListener('dragleave', e => { if (!el.stage.contains(e.relatedTarget)) el.stage.classList.remove('dragging'); });
+el.stage.addEventListener('drop', e => { e.preventDefault(); el.stage.classList.remove('dragging'); handleFiles(e.dataTransfer.files, halfOf(e)); });
+window.addEventListener('dragover', e => e.preventDefault());
+window.addEventListener('drop', e => e.preventDefault());
+
+/* Einfügen aus der Zwischenablage */
+document.addEventListener('paste', e => {
+  const f = [...((e.clipboardData && e.clipboardData.files) || [])];
+  if (f.length) { e.preventDefault(); handleFiles(f, S.a.example ? 'a' : 'b'); }
+});
+
+/* Tastenkürzel */
+document.addEventListener('keydown', e => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const n = parseInt(e.key, 10);
+  if (n >= 1 && n <= MODES.length) { setMode(MODES[n - 1].id); return; }
+  if (e.key === 'g' || e.key === 'G') { S.grid = !S.grid; syncControls(); render(); }
+  if (e.key === 'f' || e.key === 'F') resetView();
+});
+
+new ResizeObserver(render).observe(el.stage);
+
+updateSlots();
+syncControls();
+render();
+})();
+</script>
+
+</body></html>
